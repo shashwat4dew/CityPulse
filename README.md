@@ -17,7 +17,7 @@ To run this-
   In first terminal(Start the backend)
     -cd City,
     -node app.js || 
-   In second terminak(Start the frontend)
+   In second terminal(Start the frontend)
     -cd City,
     -cd client,
     -npm run dev,
