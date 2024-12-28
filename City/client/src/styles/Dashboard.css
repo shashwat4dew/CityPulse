@@ -1,28 +1,179 @@
-.completed-mark {
-  color: green;
+/* Advanced Dashboard Design */
+
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at top left, #1e1e30, #141419);
+  color: #eaeaea;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 30px;
+  color: #ffffff;
+  text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0px 4px 10px rgba(255, 255, 255, 0.5);
+  }
+  to {
+    text-shadow: 0px 4px 20px rgba(255, 255, 255, 0.8);
+  }
+}
+
+form {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 50px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: slideUp 1.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+form input[type="file"] {
+  display: none;
+}
+
+form label {
+  background: linear-gradient(135deg, #6c63ff, #4e9ce9);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  cursor: pointer;
   font-weight: bold;
-  margin-top: 5px;
+  text-align: center;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+form label:hover {
+  background: linear-gradient(135deg, #4e9ce9, #6c63ff);
+  transform: scale(1.05);
+}
+
+form input[type="text"] {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+form input[type="text"]:focus {
+  border: 1px solid #6c63ff;
+}
+
+form input[type="text"]::placeholder {
+  color: #cccccc;
+}
+
+form button {
+  background: linear-gradient(135deg, #131815, #0f0f0f);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+form button:hover {
+  background: linear-gradient(135deg, #353838, #3d4240);
+  transform: scale(1.05);
+}
+
+.uploads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
 }
 
 .upload-item {
-  border: 1px solid #ddd;
-  padding: 10px;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.upload-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+.upload-item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.upload-item p {
   margin: 10px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-size: 1rem;
+  color: #eaeaea;
 }
 
-button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.completed-mark {
+  color: #32de84;
+  font-weight: bold;
+  margin-top: 8px;
+  font-size: 0.95rem;
 }
 
-button:hover {
-  background-color: #0056b3;
+/* Responsive Design */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  form {
+    width: 90%;
+  }
+
+  .upload-item img {
+    height: 140px;
+  }
 }
