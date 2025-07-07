@@ -146,22 +146,40 @@ const Dashboard = () => {
   const [image, setImage] = useState(null);
   const [uploads, setUploads] = useState([]);
 
+  // const fetchUploads = async () => {
+  //   try {
+  //     // Get the token from localStorage
+  //     const token = localStorage.getItem("token");
+
+  //     const res = await axios.get("http://localhost:3000/api/uploads", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`, // Include token in Authorization header
+  //       },
+  //     });
+
+  //     setUploads(res.data.uploads);
+  //   } catch (err) {
+  //     console.error("Error fetching uploads:", err);
+  //   }
+  // };
+
   const fetchUploads = async () => {
-    try {
-      // Get the token from localStorage
-      const token = localStorage.getItem("token");
+  try {
+    const token = localStorage.getItem("token");
+    console.log("🚀 Token from localStorage:", token);  // Add this
 
-      const res = await axios.get("http://localhost:3000/api/uploads", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in Authorization header
-        },
-      });
+    const res = await axios.get("http://localhost:3000/api/uploads", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      setUploads(res.data.uploads);
-    } catch (err) {
-      console.error("Error fetching uploads:", err);
-    }
-  };
+    setUploads(res.data.uploads);
+  } catch (err) {
+    console.error("Error fetching uploads:", err);
+  }
+};
+
 
   useEffect(() => {
     fetchUploads();
