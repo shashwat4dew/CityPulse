@@ -15,7 +15,9 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173", // Local frontend (dev)
-  "https://city-pulse-ijpl.vercel.app", // Your deployed frontend
+  "https://city-pulse-ijpl.vercel.app",
+  "https://city-pulse-ijpl-bc6ief1vy-shashwat-dewangans-projects.vercel.app",
+  // Your deployed frontend
 ];
 
 app.use(
