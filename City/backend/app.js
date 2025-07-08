@@ -9,7 +9,13 @@ const mainRouter = require("./routes/user");
 
 app.use(express.json());
 
-app.use(cors())
+// app.use(cors())
+
+app.use(cors({
+  origin: 'https://<your-vercel-domain>',
+  credentials: true
+}));
+
 app.use("/api", mainRouter);
 
 app.use("/uploads", express.static("uploads"));
