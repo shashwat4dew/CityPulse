@@ -141,8 +141,9 @@ const uploadImage = async (req, res) => {
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
-
-    const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+//here
+const baseURL = import.meta.env.VITE_BACKEND_URL;
+    const imageUrl = `${baseURL}/uploads/${req.file.filename}`;
     console.log("Saved Image URL:", req.file.filename); // Add this line
 
     // Create a new upload entry
