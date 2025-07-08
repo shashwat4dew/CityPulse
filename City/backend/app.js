@@ -11,10 +11,20 @@ app.use(express.json());
 
 // app.use(cors())
 
-app.use(cors({
-  origin: 'https://city-pulse-ijpl-r7k597ain-shashwat-dewangans-projects.vercel.app/',
-  credentials: true
-}));
+const cors = require("cors");
+
+const allowedOrigins = [
+  "http://localhost:5173", // Local frontend (dev)
+  "https://city-pulse-ijpl.vercel.app", // Your deployed frontend
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 
 app.use("/api", mainRouter);
 
