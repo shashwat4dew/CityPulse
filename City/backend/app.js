@@ -11,7 +11,7 @@ app.use(express.json());
 
 // app.use(cors())
 
-const cors = require("cors");
+
 
 const allowedOrigins = [
   "http://localhost:5173", // Local frontend (dev)
