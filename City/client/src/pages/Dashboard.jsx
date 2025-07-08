@@ -140,6 +140,12 @@ import "../styles/Dashboard.css";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+const baseURL = import.meta.env.VITE_BACKEND_URL;
+
+await axios.get(`${baseURL}/uploads`, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
 
 const Dashboard = () => {
   const [description, setDescription] = useState("");
