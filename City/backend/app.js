@@ -17,6 +17,7 @@ const allowedOrigins = [
   "http://localhost:5173", // Local frontend (dev)
   "https://city-pulse-ijpl.vercel.app",
   "https://city-pulse-ijpl-bc6ief1vy-shashwat-dewangans-projects.vercel.app",
+  "https://city-pulse-ijpl-qdq31a6xn-shashwat-dewangans-projects.vercel.app"
   // Your deployed frontend
 ];
 
