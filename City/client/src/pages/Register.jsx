@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-
+const baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const Login = () => {
   const [ showPassword, setShowPassword ] = useState(false);
@@ -35,7 +35,7 @@ const Login = () => {
           password
         };
         try{
-        const response = await axios.post("http://localhost:3000/api/register", formData);
+        const response = await axios.post(`${baseURL}/api/register`, formData);
         localStorage.setItem("token", response.data.token);
 
          toast.success("Registration successfull");

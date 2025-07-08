@@ -144,7 +144,7 @@ const Login = () => {
     if (email.length > 0 && password.length > 0) {
       const formData = { email, password };
       try {
-        const response = await axios.post(`${baseURL}/login`, formData);
+        const response = await axios.post(`${baseURL}/api/login`, formData);
   
         // Save token and email to localStorage
         const { token } = response.data;
