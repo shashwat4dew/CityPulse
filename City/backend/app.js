@@ -12,7 +12,7 @@ app.use(express.json());
 // app.use(cors())
 
 app.use(cors({
-  origin: 'https://<your-vercel-domain>',
+  origin: 'https://city-pulse-ijpl-r7k597ain-shashwat-dewangans-projects.vercel.app/',
   credentials: true
 }));
 
