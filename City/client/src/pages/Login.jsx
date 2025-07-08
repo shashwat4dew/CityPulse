@@ -129,6 +129,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const baseURL = import.meta.env.VITE_BACKEND_URL;
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [token, setToken] = useState(JSON.parse(localStorage.getItem("auth")) || "");
@@ -142,7 +144,7 @@ const Login = () => {
     if (email.length > 0 && password.length > 0) {
       const formData = { email, password };
       try {
-        const response = await axios.post("http://localhost:3000/api/login", formData);
+        const response = await axios.post(`${baseURL}/login`, formData);
   
         // Save token and email to localStorage
         const { token } = response.data;
