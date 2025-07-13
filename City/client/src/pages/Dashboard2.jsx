@@ -290,7 +290,7 @@ const AdminDashboard = () => {
           {uploads.map((upload, index) => (
             <div key={index} className="upload-item">
               <img
-                src={upload.imageUrl}
+                src={`${baseURL}${upload.imageUrl}`}
                 alt={upload.description}
                 width="200"
                 onError={(e) => {
