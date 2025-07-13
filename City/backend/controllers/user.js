@@ -310,7 +310,42 @@ const getAllUsers = async (req, res) => {
   return res.status(200).json({ users });
 };
 
-// Upload image
+// // Upload image
+// const uploadImage = async (req, res) => {
+//   try {
+//     const { description } = req.body;
+
+//     if (!description || !req.file) {
+//       return res.status(400).json({ msg: "Image and description are required" });
+//     }
+
+//     const user = await User.findById(req.user.id);
+//     if (!user) {
+//       return res.status(404).json({ msg: "User not found" });
+//     }
+
+//     // Use backend URL from .env or fallback
+//     const baseURL = process.env.BACKEND_URL || "http://localhost:3000";
+//     const imageUrl = `${baseURL}/uploads/${req.file.filename}`;
+
+//     const newUpload = new Upload({
+//       imageUrl,
+//       description,
+//       user: req.user.id,
+//     });
+
+//     await newUpload.save();
+
+//     res.status(200).json({
+//       msg: "Image uploaded successfully",
+//       upload: newUpload,
+//     });
+//   } catch (err) {
+//     console.error("Error uploading image:", err);
+//     res.status(500).json({ msg: "Internal server error" });
+//   }
+// };
+
 const uploadImage = async (req, res) => {
   try {
     const { description } = req.body;
@@ -324,9 +359,9 @@ const uploadImage = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // Use backend URL from .env or fallback
-    const baseURL = process.env.BACKEND_URL || "http://localhost:3000";
-    const imageUrl = `${baseURL}/uploads/${req.file.filename}`;
+    // ✅ Use simple relative URL — this is how it worked earlier
+    const imageUrl = `/uploads/${req.file.filename}`;
+    console.log("Saved Image URL:", imageUrl);
 
     const newUpload = new Upload({
       imageUrl,
@@ -345,6 +380,9 @@ const uploadImage = async (req, res) => {
     res.status(500).json({ msg: "Internal server error" });
   }
 };
+
+
+
 
 // Get user uploads
 const getUserUploads = async (req, res) => {
