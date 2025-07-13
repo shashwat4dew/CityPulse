@@ -359,9 +359,8 @@ const uploadImage = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // ✅ Use simple relative URL — this is how it worked earlier
+    // ✅ Save only the relative path
     const imageUrl = `/uploads/${req.file.filename}`;
-    console.log("Saved Image URL:", imageUrl);
 
     const newUpload = new Upload({
       imageUrl,
@@ -380,6 +379,7 @@ const uploadImage = async (req, res) => {
     res.status(500).json({ msg: "Internal server error" });
   }
 };
+
 
 
 

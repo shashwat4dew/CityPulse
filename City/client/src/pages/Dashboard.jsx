@@ -162,9 +162,8 @@
 
 // export default Dashboard;
 
-
 import "../styles/Dashboard.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
@@ -173,7 +172,7 @@ const Dashboard = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [uploads, setUploads] = useState([]);
-  const fileInputRef = React.useRef();
+  const fileInputRef = useRef();
 
   const fetchUploads = async () => {
     try {
@@ -215,15 +214,6 @@ const Dashboard = () => {
       return alert("You must be logged in to upload.");
     }
 
-    const optimisticUpload = {
-      imageUrl: URL.createObjectURL(image),
-      description,
-      user: "current-user-id",
-      status: "pending",
-    };
-
-    setUploads((prevUploads) => [...prevUploads, optimisticUpload]);
-
     try {
       const res = await axios.post(`${baseURL}/api/upload`, formData, {
         headers: {
@@ -232,11 +222,8 @@ const Dashboard = () => {
         },
       });
 
-      setUploads((prevUploads) =>
-        prevUploads.map((upload) =>
-          upload.imageUrl === optimisticUpload.imageUrl ? res.data.upload : upload
-        )
-      );
+      // Add the actual response to uploads
+      setUploads((prevUploads) => [...prevUploads, res.data.upload]);
 
       setDescription("");
       setImage(null);
@@ -274,12 +261,12 @@ const Dashboard = () => {
           uploads.map((upload, index) => (
             <div key={index} className="upload-item">
               <img
-                src={upload.imageUrl}
+                src={`${baseURL}${upload.imageUrl}`} // ✅ Prefix with backend URL
                 alt="upload"
                 width="200"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/path/to/default/image.jpg";
+                  e.target.src = "/fallback.jpg"; // ✅ Update if needed
                 }}
               />
               <p>{upload.description}</p>
