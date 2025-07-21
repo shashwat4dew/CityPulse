@@ -127,245 +127,73 @@
 
 // export default Login;
 
-// import React, { useEffect, useState } from "react";
-// import Image from "../assets/image.png";
-// import Logo from "../assets/logo.png";
-// import GoogleSvg from "../assets/icons8-google.svg";
-// import { FaEye, FaEyeSlash } from "react-icons/fa6";
-// import "../styles/Register.css";
-// import { Link, useNavigate } from "react-router-dom";
-// import axios from "axios";
-// import { toast } from "react-toastify";
-// import { auth } from "../firebase";
-// import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-
-// const baseURL = import.meta.env.VITE_BACKEND_URL;
-
-// const Register = () => {
-//   const navigate = useNavigate();
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [token, setToken] = useState(localStorage.getItem("auth") || "");
-//   const [phone, setPhone] = useState("");
-//   const [otp, setOtp] = useState("");
-//   const [verificationId, setVerificationId] = useState(null);
-//   const [otpSent, setOtpSent] = useState(false);
-
-//   useEffect(() => {
-//     if (token !== "") {
-//       const email = localStorage.getItem("email");
-//       if (window.location.pathname !== "/login" && window.location.pathname !== "/register") {
-//         if (email === "admin@example.com") {
-//           navigate("/dashboard2");
-//         } else {
-//           navigate("/dashboard");
-//         }
-//       }
-//     }
-//   }, [token, navigate]);
-
-//   const setupRecaptcha = () => {
-//     window.recaptchaVerifier = new RecaptchaVerifier(
-//       auth,
-//       "recaptcha-container",
-//       {
-//         size: "invisible",
-//         callback: () => {},
-//       }
-//     );
-//   };
-
-//   const sendOtp = async () => {
-//     if (!phone) {
-//       toast.error("Enter phone number");
-//       return;
-//     }
-
-//     setupRecaptcha();
-//     const appVerifier = window.recaptchaVerifier;
-
-//     try {
-//       const confirmation = await signInWithPhoneNumber(auth, phone, appVerifier);
-//       setVerificationId(confirmation);
-//       setOtpSent(true);
-//       toast.success("OTP sent successfully");
-//     } catch (err) {
-//       toast.error("Failed to send OTP: " + err.message);
-//     }
-//   };
-
-//   const verifyOtpAndRegister = async (e) => {
-//     e.preventDefault();
-//     const name = e.target.name.value;
-//     const lastname = e.target.lastname.value;
-//     const email = e.target.email.value;
-//     const password = e.target.password.value;
-//     const confirmPassword = e.target.confirmPassword.value;
-
-//     if (!name || !lastname || !email || !password || !confirmPassword) {
-//       toast.error("Please fill all fields");
-//       return;
-//     }
-
-//     if (password !== confirmPassword) {
-//       toast.error("Passwords do not match");
-//       return;
-//     }
-
-//     if (!otpSent || !otp) {
-//       toast.error("OTP not verified");
-//       return;
-//     }
-
-//     try {
-//       await verificationId.confirm(otp);
-//       const formData = {
-//         username: `${name} ${lastname}`,
-//         email,
-//         password,
-//         phone,
-//       };
-
-//       const response = await axios.post(`${baseURL}/api/register`, formData);
-//       localStorage.setItem("token", response.data.token);
-//       toast.success("Registration successful");
-//       navigate("/login");
-//     } catch (err) {
-//       toast.error("Invalid OTP or registration failed");
-//     }
-//   };
-
-//   return (
-//     <div className="register-main">
-//       <div className="register-left">
-//         <img src={Image} alt="" />
-//       </div>
-//       <div className="register-right">
-//         <div className="register-right-container">
-//           <div className="register-logo">
-//             <img src={Logo} alt="" />
-//           </div>
-//           <div className="register-center">
-//             <h2>Welcome to our website!</h2>
-//             <p>Please enter your details</p>
-//             <form onSubmit={verifyOtpAndRegister}>
-//               <input type="text" placeholder="Name" name="name" required />
-//               <input type="text" placeholder="Last Name" name="lastname" required />
-//               <input type="email" placeholder="Email" name="email" required />
-//               <input
-//                 type="tel"
-//                 placeholder="Phone (e.g. +91xxxxxxxxxx)"
-//                 value={phone}
-//                 onChange={(e) => setPhone(e.target.value)}
-//                 required
-//               />
-//               <button type="button" onClick={sendOtp}>
-//                 Send OTP
-//               </button>
-//               {otpSent && (
-//                 <input
-//                   type="text"
-//                   placeholder="Enter OTP"
-//                   value={otp}
-//                   onChange={(e) => setOtp(e.target.value)}
-//                   required
-//                 />
-//               )}
-//               <div className="pass-input-div">
-//                 <input
-//                   type={showPassword ? "text" : "password"}
-//                   placeholder="Password"
-//                   name="password"
-//                   required
-//                 />
-//                 {showPassword ? (
-//                   <FaEyeSlash onClick={() => setShowPassword(!showPassword)} />
-//                 ) : (
-//                   <FaEye onClick={() => setShowPassword(!showPassword)} />
-//                 )}
-//               </div>
-//               <div className="pass-input-div">
-//                 <input
-//                   type={showPassword ? "text" : "password"}
-//                   placeholder="Confirm Password"
-//                   name="confirmPassword"
-//                   required
-//                 />
-//                 {showPassword ? (
-//                   <FaEyeSlash onClick={() => setShowPassword(!showPassword)} />
-//                 ) : (
-//                   <FaEye onClick={() => setShowPassword(!showPassword)} />
-//                 )}
-//               </div>
-//               <div className="register-center-buttons">
-//                 <button type="submit">Sign Up</button>
-//                 <button type="submit">
-//                   <img src={GoogleSvg} alt="" />
-//                   Sign Up with Google
-//                 </button>
-//               </div>
-//             </form>
-//             <div id="recaptcha-container"></div>
-//           </div>
-//           <p className="login-bottom-p">
-//             Already have an account? <Link to="/login">Login</Link>
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Register;
-
-
 import React, { useEffect, useState } from "react";
-import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "../firebase";
+import Image from "../assets/image.png";
+import Logo from "../assets/logo.png";
+import GoogleSvg from "../assets/icons8-google.svg";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import "../styles/Register.css";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "../styles/Register.css";
-import { useNavigate, Link } from "react-router-dom";
+import { auth } from "../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [otp, setOtp] = useState("");
-
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem("auth") || "");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [verificationId, setVerificationId] = useState(null);
+  const [otpSent, setOtpSent] = useState(false);
 
   useEffect(() => {
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "invisible",
-      callback: (response) => {
-        console.log("reCAPTCHA verified");
-      },
-      "expired-callback": () => {
-        toast.error("reCAPTCHA expired. Please try again.");
-      },
-    });
-  }, []);
+    if (token !== "") {
+      const email = localStorage.getItem("email");
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register") {
+        if (email === "admin@example.com") {
+          navigate("/dashboard2");
+        } else {
+          navigate("/dashboard");
+        }
+      }
+    }
+  }, [token, navigate]);
 
-  const handleSendOTP = async () => {
-    if (!phoneNumber.match(/^\+91\d{10}$/)) {
-      return toast.error("Enter phone number in format +91XXXXXXXXXX");
+  const setupRecaptcha = () => {
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: () => {},
+      }
+    );
+  };
+
+  const sendOtp = async () => {
+    if (!phone) {
+      toast.error("Enter phone number");
+      return;
     }
 
+    setupRecaptcha();
+    const appVerifier = window.recaptchaVerifier;
+
     try {
-      const appVerifier = window.recaptchaVerifier;
-      const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-      setConfirmationResult(result);
+      const confirmation = await signInWithPhoneNumber(auth, phone, appVerifier);
+      setVerificationId(confirmation);
       setOtpSent(true);
-      toast.success("OTP sent successfully!");
+      toast.success("OTP sent successfully");
     } catch (err) {
-      console.error("OTP error", err);
-      toast.error("Failed to send OTP.");
+      toast.error("Failed to send OTP: " + err.message);
     }
   };
 
-  const handleVerifyOTPAndRegister = async (e) => {
+  const verifyOtpAndRegister = async (e) => {
     e.preventDefault();
     const name = e.target.name.value;
     const lastname = e.target.lastname.value;
@@ -373,88 +201,115 @@ const Register = () => {
     const password = e.target.password.value;
     const confirmPassword = e.target.confirmPassword.value;
 
-    if (password !== confirmPassword) return toast.error("Passwords don't match");
+    if (!name || !lastname || !email || !password || !confirmPassword) {
+      toast.error("Please fill all fields");
+      return;
+    }
 
-    if (!otpSent || !confirmationResult) {
-      return toast.error("Please verify your phone number first.");
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (!otpSent || !otp) {
+      toast.error("OTP not verified");
+      return;
     }
 
     try {
-      await confirmationResult.confirm(otp); // Verifies OTP
-
+      await verificationId.confirm(otp);
       const formData = {
-        username: name + " " + lastname,
+        username: `${name} ${lastname}`,
         email,
         password,
-        phone: phoneNumber,
+        phone,
       };
 
       const response = await axios.post(`${baseURL}/api/register`, formData);
       localStorage.setItem("token", response.data.token);
-
       toast.success("Registration successful");
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      toast.error("Invalid OTP or Registration failed");
+      toast.error("Invalid OTP or registration failed");
     }
   };
 
   return (
     <div className="register-main">
+      <div className="register-left">
+        <img src={Image} alt="" />
+      </div>
       <div className="register-right">
-        <h2>Sign Up</h2>
-        <form onSubmit={handleVerifyOTPAndRegister}>
-          <input type="text" name="name" placeholder="Name" required />
-          <input type="text" name="lastname" placeholder="Last name" required />
-          <input type="email" name="email" placeholder="Email" required />
-          <input
-            type="tel"
-            placeholder="+91XXXXXXXXXX"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-          />
-          <button type="button" onClick={handleSendOTP}>
-            Send OTP
-          </button>
-
-          {otpSent && (
-            <>
+        <div className="register-right-container">
+          <div className="register-logo">
+            <img src={Logo} alt="" />
+          </div>
+          <div className="register-center">
+            <h2>Welcome to our website!</h2>
+            <p>Please enter your details</p>
+            <form onSubmit={verifyOtpAndRegister}>
+              <input type="text" placeholder="Name" name="name" required />
+              <input type="text" placeholder="Last Name" name="lastname" required />
+              <input type="email" placeholder="Email" name="email" required />
               <input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                type="tel"
+                placeholder="Phone (e.g. +91xxxxxxxxxx)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
               />
-            </>
-          )}
-
-          <div className="pass-input-div">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              required
-            />
+              <button type="button" onClick={sendOtp}>
+                Send OTP
+              </button>
+              {otpSent && (
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                />
+              )}
+              <div className="pass-input-div">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  name="password"
+                  required
+                />
+                {showPassword ? (
+                  <FaEyeSlash onClick={() => setShowPassword(!showPassword)} />
+                ) : (
+                  <FaEye onClick={() => setShowPassword(!showPassword)} />
+                )}
+              </div>
+              <div className="pass-input-div">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  name="confirmPassword"
+                  required
+                />
+                {showPassword ? (
+                  <FaEyeSlash onClick={() => setShowPassword(!showPassword)} />
+                ) : (
+                  <FaEye onClick={() => setShowPassword(!showPassword)} />
+                )}
+              </div>
+              <div className="register-center-buttons">
+                <button type="submit">Sign Up</button>
+                <button type="submit">
+                  <img src={GoogleSvg} alt="" />
+                  Sign Up with Google
+                </button>
+              </div>
+            </form>
+            <div id="recaptcha-container"></div>
           </div>
-          <div className="pass-input-div">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              required
-            />
-          </div>
-          <button type="submit">Register</button>
-        </form>
-
-        <div id="recaptcha-container"></div>
-
-        <p>
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
+          <p className="login-bottom-p">
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
