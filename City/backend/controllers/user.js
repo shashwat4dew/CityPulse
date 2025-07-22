@@ -136,9 +136,43 @@ const getAllUsers = async (req, res) => {
 //   }
 // };
 
+// const uploadImage = async (req, res) => {
+//   try {
+//     const { description } = req.body;
+
+//     if (!description || !req.file) {
+//       return res.status(400).json({ msg: "Image and description are required" });
+//     }
+
+//     const user = await User.findById(req.user.id);
+//     if (!user) {
+//       return res.status(404).json({ msg: "User not found" });
+//     }
+
+//     // ✅ Save only the relative path
+//     const imageUrl = `/uploads/${req.file.filename}`;
+
+//     const newUpload = new Upload({
+//       imageUrl,
+//       description,
+//       user: req.user.id,
+//     });
+
+//     await newUpload.save();
+
+//     res.status(200).json({
+//       msg: "Image uploaded successfully",
+//       upload: newUpload,
+//     });
+//   } catch (err) {
+//     console.error("Error uploading image:", err);
+//     res.status(500).json({ msg: "Internal server error" });
+//   }
+// };
+
 const uploadImage = async (req, res) => {
   try {
-    const { description } = req.body;
+    const { description, location, address } = req.body;
 
     if (!description || !req.file) {
       return res.status(400).json({ msg: "Image and description are required" });
@@ -149,13 +183,18 @@ const uploadImage = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // ✅ Save only the relative path
+    // ✅ Save only relative path for frontend compatibility
     const imageUrl = `/uploads/${req.file.filename}`;
 
     const newUpload = new Upload({
       imageUrl,
       description,
       user: req.user.id,
+      location: location ? {
+        lat: location.lat,
+        lng: location.lng,
+        address: address || ""
+      } : undefined,
     });
 
     await newUpload.save();
@@ -169,7 +208,6 @@ const uploadImage = async (req, res) => {
     res.status(500).json({ msg: "Internal server error" });
   }
 };
-
 
 
 

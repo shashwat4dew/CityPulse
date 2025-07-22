@@ -39,6 +39,12 @@ const uploadSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  location: {
+  lat: { type: Number },
+  lng: { type: Number },
+  address: { type: String },
+},
+
   status: { type: String, enum: ["pending", "completed"], default: "pending" },
 });
 
