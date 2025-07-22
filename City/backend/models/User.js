@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
   phoneNumber: {
   type: String,
   required: [true, "Please provide phone number"],
-  unique: true,
+  unique: false,
   },
 });
 
