@@ -123,15 +123,16 @@
 
 // export default Dashboard;
 
-
 import "../styles/Dashboard.css";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix default marker issue in Leaflet
+const baseURL = import.meta.env.VITE_BACKEND_URL;
+
+// Fix leaflet default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -142,28 +143,46 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-const baseURL = import.meta.env.VITE_BACKEND_URL;
+// Component to handle map clicks
+const LocationMarker = ({ setLat, setLng, setAddress }) => {
+  useMapEvents({
+    click: async (e) => {
+      const { lat, lng } = e.latlng;
+      setLat(lat);
+      setLng(lng);
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+        );
+        const data = await res.json();
+        setAddress(data.display_name);
+      } catch (err) {
+        console.error("Reverse geocoding failed", err);
+        setAddress("Unknown Location");
+      }
+    },
+  });
+
+  return null;
+};
 
 const Dashboard = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [uploads, setUploads] = useState([]);
-  const [location, setLocation] = useState({ lat: null, lng: null, address: "" });
-  const [showMap, setShowMap] = useState(false);
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
+  const [address, setAddress] = useState("");
   const fileInputRef = useRef();
 
   const fetchUploads = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("No token found");
-        return;
-      }
+      if (!token) return;
 
       const res = await axios.get(`${baseURL}/api/uploads`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setUploads(res.data.uploads);
@@ -178,17 +197,16 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!image || !description) {
-      return alert("Please provide both an image and a description.");
+    if (!image || !description || !lat || !lng || !address) {
+      return alert("Please provide all fields including map location.");
     }
 
     const formData = new FormData();
     formData.append("image", image);
     formData.append("description", description);
-    formData.append("lat", location.lat);
-    formData.append("lng", location.lng);
-    formData.append("address", location.address);
+    formData.append("lat", lat);
+    formData.append("lng", lng);
+    formData.append("address", address);
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -203,21 +221,24 @@ const Dashboard = () => {
         },
       });
 
-      setUploads((prevUploads) => [...prevUploads, res.data.upload]);
+      setUploads((prev) => [...prev, res.data.upload]);
       setDescription("");
       setImage(null);
-      setLocation({ lat: null, lng: null, address: "" });
+      setLat(null);
+      setLng(null);
+      setAddress("");
       fileInputRef.current.value = "";
     } catch (err) {
-      console.error("Error uploading image:", err.response?.data || err.message);
-      alert("Failed to upload image. Please try again.");
+      console.error("Upload failed:", err);
+      alert("Upload failed");
     }
   };
 
   return (
-    <div>
-      <h1>Upload Issues</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="dashboard-container">
+      <h1>Upload Issue</h1>
+
+      <form onSubmit={handleSubmit} className="upload-form">
         <label htmlFor="fileInput">Upload an Image</label>
         <input
           id="fileInput"
@@ -226,6 +247,7 @@ const Dashboard = () => {
           onChange={(e) => setImage(e.target.files[0])}
           required
         />
+
         <input
           type="text"
           value={description}
@@ -234,65 +256,36 @@ const Dashboard = () => {
           required
         />
 
-        <button type="button" onClick={() => setShowMap(true)}>
-          Pick Location on Map
-        </button>
+        <div className="map-wrapper">
+          <label>Pick Location on Map:</label>
+          <MapContainer
+            center={[20.5937, 78.9629]}
+            zoom={5}
+            style={{ height: "300px", width: "100%", marginTop: "1rem" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {lat && lng && (
+              <Marker position={[lat, lng]}>
+                <Popup>{address || "Selected location"}</Popup>
+              </Marker>
+            )}
+            <LocationMarker setLat={setLat} setLng={setLng} setAddress={setAddress} />
+          </MapContainer>
+        </div>
 
-        {location.address && (
-          <p>
-            <strong>Selected Address:</strong> {location.address}
-          </p>
-        )}
+        {address && <p><strong>Address:</strong> {address}</p>}
 
         <button type="submit">Submit</button>
       </form>
 
-      {showMap && (
-        <div style={{ height: "400px", margin: "1rem 0" }}>
-          <MapContainer
-            center={[20.5937, 78.9629]}
-            zoom={5}
-            style={{ height: "100%", width: "100%" }}
-            onClick={(e) => {
-              const lat = e.latlng.lat;
-              const lng = e.latlng.lng;
-              setLocation((prev) => ({ ...prev, lat, lng }));
-
-              fetch(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  setLocation((prev) => ({
-                    ...prev,
-                    address: data.display_name,
-                  }));
-                })
-                .catch((err) => {
-                  console.error("Error fetching address:", err);
-                });
-            }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {location.lat && location.lng && (
-              <Marker position={[location.lat, location.lng]}>
-                <Popup>{location.address || "Selected Location"}</Popup>
-              </Marker>
-            )}
-          </MapContainer>
-          <button onClick={() => setShowMap(false)} style={{ marginTop: "1rem" }}>
-            Done
-          </button>
-        </div>
-      )}
-
+      <hr />
+      <h2>Previous Uploads</h2>
       <div className="uploads">
-        {Array.isArray(uploads) && uploads.length > 0 ? (
-          uploads.map((upload, index) => (
-            <div key={index} className="upload-item">
+        {uploads.length > 0 ? (
+          uploads.map((upload, idx) => (
+            <div key={idx} className="upload-item">
               <img
                 src={`${baseURL}${upload.imageUrl}`}
                 alt="upload"
@@ -303,11 +296,7 @@ const Dashboard = () => {
                 }}
               />
               <p>{upload.description}</p>
-              {upload.address && (
-                <p>
-                  <strong>Location:</strong> {upload.address}
-                </p>
-              )}
+              {upload.address && <p><strong>📍</strong> {upload.address}</p>}
               {upload.status === "completed" && (
                 <p className="completed-mark">✅ Solved</p>
               )}
