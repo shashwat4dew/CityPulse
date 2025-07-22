@@ -250,17 +250,13 @@ const Login = () => {
                   Forgot password?
                 </a>
               </div>
-              {/* <div className="login-center-buttons">
+              <div className="login-center-buttons">
                 <button type="submit">Log In</button>
                 <button type="submit">
                   <img src={GoogleSvg} alt="" />
                   Log In with Google
                 </button>
-              </div> */}
-              <button type="button">
-  <img src={GoogleSvg} alt="" />
-  Sign Up with Google
-</button>
+              </div>
             </form>
           </div>
 
