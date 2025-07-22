@@ -162,7 +162,9 @@ const Login = () => {
         }
       } catch (err) {
         console.log(err);
-        toast.error(err.response?.data?.message || "Login failed");
+        //toast.error(err.response?.data?.message || "Login failed");
+        toast.error(err.response?.data?.msg || "Login failed");
+
       }
     } else {
       toast.error("Please fill all inputs");
