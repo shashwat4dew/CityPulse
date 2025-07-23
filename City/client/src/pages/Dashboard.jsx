@@ -312,7 +312,6 @@
 
 // export default Dashboard;
 
-
 import "../styles/Dashboard.css";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
@@ -340,7 +339,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// Handle map click to get location
+// Component to get clicked map location
 const LocationMarker = ({ setLat, setLng, setAddress }) => {
   useMapEvents({
     click: async (e) => {
@@ -371,6 +370,7 @@ const Dashboard = () => {
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [address, setAddress] = useState("");
+  const [mapVisibleId, setMapVisibleId] = useState(null);
   const fileInputRef = useRef();
 
   const fetchUploads = async () => {
@@ -392,7 +392,7 @@ const Dashboard = () => {
     const email = localStorage.getItem("email");
     const token = localStorage.getItem("token");
 
-    // ✅ Redirect admin to dashboard2
+    // ✅ Redirect admin
     if (token && email === "admin@example.com") {
       navigate("/dashboard2");
     }
@@ -435,6 +435,10 @@ const Dashboard = () => {
       console.error("Upload failed:", err);
       alert("Upload failed");
     }
+  };
+
+  const toggleMap = (id) => {
+    setMapVisibleId((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -501,11 +505,42 @@ const Dashboard = () => {
                 }}
               />
               <p>{upload.description}</p>
+
               {upload.location?.address && (
                 <p><strong>📍</strong> {upload.location.address}</p>
               )}
+
               {upload.status === "completed" && (
                 <p className="completed-mark">✅ Solved</p>
+              )}
+
+              {upload.location?.lat && upload.location?.lng && (
+                <>
+                  <button onClick={() => toggleMap(upload._id)} style={{ marginTop: "5px" }}>
+                    {mapVisibleId === upload._id ? "Hide Map" : "View on Map"}
+                  </button>
+
+                  {mapVisibleId === upload._id && (
+                    <MapContainer
+                      center={[upload.location.lat, upload.location.lng]}
+                      zoom={13}
+                      scrollWheelZoom={false}
+                      style={{
+                        height: "250px",
+                        width: "100%",
+                        marginTop: "10px",
+                        border: "1px solid #ccc",
+                      }}
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Marker position={[upload.location.lat, upload.location.lng]}>
+                        <Popup>{upload.location.address}</Popup>
+                      </Marker>
+                    </MapContainer>
+                  )}
+                </>
               )}
             </div>
           ))
