@@ -319,6 +319,7 @@ import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "./dash.css"
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
