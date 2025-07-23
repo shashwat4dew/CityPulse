@@ -4,63 +4,30 @@ body {
   font-family: "Segoe UI", sans-serif;
 }
 
-.dashboard-container {
+.admin-dashboard {
   padding: 2rem;
   max-width: 1000px;
   margin: auto;
 }
 
-h1, h2 {
+h1 {
   text-align: center;
   color: #90caf9;
-}
-
-.upload-form {
-  background: #1e1e1e;
-  padding: 1.5rem;
-  border-radius: 10px;
   margin-bottom: 2rem;
-  box-shadow: 0 0 10px rgba(144, 202, 249, 0.2);
 }
 
-.upload-form input[type="text"],
-.upload-form input[type="file"] {
-  display: block;
-  width: 100%;
+.error {
+  color: #f44336;
+  text-align: center;
   margin-bottom: 1rem;
-  padding: 0.6rem;
-  border-radius: 5px;
-  background: #2e2e2e;
-  color: #fff;
-  border: 1px solid #444;
 }
 
-.upload-form button {
-  padding: 0.6rem 1.2rem;
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: 0.3s;
-}
-
-.upload-form button:hover {
-  background: #2196f3;
-}
-
-.address-preview {
-  margin-top: 0.5rem;
-  font-style: italic;
-  color: #ccc;
-}
-
+/* Filter section */
 .filter-bar {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 }
 
 .filter-bar select {
@@ -71,24 +38,24 @@ h1, h2 {
   border: 1px solid #555;
 }
 
-/* Upload Card Design */
 .uploads {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.upload-card {
+/* Upload cards */
+.upload-item {
+  background: #1e1e1e;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  background: #1e1e1e;
   padding: 1rem;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
 }
 
-.upload-card img {
+.upload-item img {
   width: 200px;
   height: 150px;
   object-fit: cover;
@@ -101,33 +68,44 @@ h1, h2 {
 }
 
 .upload-info p {
-  margin-bottom: 0.4rem;
+  margin: 0.4rem 0;
 }
 
-.upload-info .completed {
-  color: #4caf50;
+.status {
   font-weight: bold;
+  font-size: 0.95rem;
+  color: #ff9800;
 }
 
-.toggle-map,
-.status-btn {
+.status.completed {
+  color: #4caf50;
+}
+
+.status.pending {
+  color: #f44336;
+}
+
+/* Button styling */
+.status-btn,
+.toggle-map {
   background-color: #333;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 0.4rem 0.8rem;
-  margin-top: 0.4rem;
+  margin-top: 0.5rem;
   margin-right: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
 }
 
-.toggle-map:hover,
-.status-btn:hover {
+.status-btn:hover,
+.toggle-map:hover {
   background-color: #555;
 }
 
-.leaflet-container {
-  border-radius: 10px;
+.map-preview {
+  margin-top: 10px;
+  border-radius: 8px;
   overflow: hidden;
 }
