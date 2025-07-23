@@ -221,7 +221,6 @@
 
 
 
-
 import "../styles/Dashboard.css";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
@@ -429,9 +428,16 @@ const Dashboard = () => {
                 {upload.location?.address && (
                   <p><strong>📍</strong> {upload.location.address}</p>
                 )}
-                {upload.status === "completed" && (
-                  <p className="completed">✅ Solved</p>
-                )}
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span
+                    style={{
+                      color: upload.status === "completed" ? "#4caf50" : "#ffc107",
+                    }}
+                  >
+                    {upload.status.toUpperCase()}
+                  </span>
+                </p>
                 <button
                   className="toggle-map"
                   onClick={() =>
@@ -470,4 +476,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
