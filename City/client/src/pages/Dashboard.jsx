@@ -312,10 +312,10 @@
 
 // export default Dashboard;
 
-
 import "../styles/Dashboard.css";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import {
   MapContainer,
   TileLayer,
@@ -339,20 +339,22 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+// Handle map click to get location
 const LocationMarker = ({ setLat, setLng, setAddress }) => {
   useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
       setLat(lat);
       setLng(lng);
+
       try {
         const res = await fetch(
           `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
         );
         const data = await res.json();
-        setAddress(data.display_name);
+        setAddress(data.display_name || "Unknown Location");
       } catch (err) {
-        console.error("Reverse geocoding failed", err);
+        console.error("Geocoding failed", err);
         setAddress("Unknown Location");
       }
     },
@@ -361,14 +363,13 @@ const LocationMarker = ({ setLat, setLng, setAddress }) => {
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [uploads, setUploads] = useState([]);
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [address, setAddress] = useState("");
-  const [showMapPopup, setShowMapPopup] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null);
   const fileInputRef = useRef();
 
   const fetchUploads = async () => {
@@ -387,13 +388,21 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    const email = localStorage.getItem("email");
+    const token = localStorage.getItem("token");
+
+    // ✅ Redirect admin to dashboard2
+    if (token && email === "admin@example.com") {
+      navigate("/dashboard2");
+    }
+
     fetchUploads();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!image || !description || !lat || !lng || !address) {
-      return alert("Please fill all fields and select a location.");
+      return alert("Please provide all fields including map location.");
     }
 
     const formData = new FormData();
@@ -404,7 +413,7 @@ const Dashboard = () => {
     formData.append("address", address);
 
     const token = localStorage.getItem("token");
-    if (!token) return alert("Login required");
+    if (!token) return alert("Login required.");
 
     try {
       const res = await axios.post(`${baseURL}/api/upload`, formData, {
@@ -427,11 +436,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleViewLocation = (location) => {
-    setSelectedLocation(location);
-    setShowMapPopup(true);
-  };
-
   return (
     <div className="dashboard-container">
       <h1>Upload Issue</h1>
@@ -445,6 +449,7 @@ const Dashboard = () => {
           onChange={(e) => setImage(e.target.files[0])}
           required
         />
+
         <input
           type="text"
           value={description}
@@ -466,7 +471,11 @@ const Dashboard = () => {
                 <Popup>{address || "Selected location"}</Popup>
               </Marker>
             )}
-            <LocationMarker setLat={setLat} setLng={setLng} setAddress={setAddress} />
+            <LocationMarker
+              setLat={setLat}
+              setLng={setLng}
+              setAddress={setAddress}
+            />
           </MapContainer>
         </div>
 
@@ -497,52 +506,12 @@ const Dashboard = () => {
               {upload.status === "completed" && (
                 <p className="completed-mark">✅ Solved</p>
               )}
-              {upload.location?.lat && upload.location?.lng && (
-                <button
-                  onClick={() => handleViewLocation(upload.location)}
-                  style={{
-                    marginTop: "0.5rem",
-                    padding: "5px 10px",
-                    background: "#007bff",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  View on Map
-                </button>
-              )}
             </div>
           ))
         ) : (
           <p>No uploads available</p>
         )}
       </div>
-
-      {showMapPopup && selectedLocation && (
-        <div className="map-popup">
-          <div className="map-popup-inner">
-            <button
-              className="close-btn"
-              onClick={() => setShowMapPopup(false)}
-              style={{ float: "right", marginBottom: "5px" }}
-            >
-              ✖
-            </button>
-            <MapContainer
-              center={[selectedLocation.lat, selectedLocation.lng]}
-              zoom={15}
-              style={{ height: "300px", width: "100%" }}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
-                <Popup>{selectedLocation.address}</Popup>
-              </Marker>
-            </MapContainer>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
