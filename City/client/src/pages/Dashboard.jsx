@@ -482,7 +482,7 @@ const Dashboard = () => {
                 }}
               />
               <p>{upload.description}</p>
-              {upload.location.address && (
+              {upload.location?.address && (
                 <p><strong>📍</strong> {upload.location.address}</p>
               )}
               {upload.status === "completed" && (
