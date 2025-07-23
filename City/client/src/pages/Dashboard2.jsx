@@ -230,12 +230,30 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-
 import "../styles/Dashboard2.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
+
+// Fix leaflet default icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 const AdminDashboard = () => {
   const [uploads, setUploads] = useState([]);
@@ -283,6 +301,7 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       <h1>Admin Dashboard</h1>
       {error && <p className="error">{error}</p>}
+
       {uploads.length === 0 ? (
         <p>No uploads found.</p>
       ) : (
@@ -295,10 +314,29 @@ const AdminDashboard = () => {
                 width="200"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/fallback.jpg"; // Make sure fallback.jpg exists in /public
+                  e.target.src = "/fallback.jpg";
                 }}
               />
               <p>{upload.description}</p>
+              {upload.location?.address && (
+                <p><strong>📍 Address:</strong> {upload.location.address}</p>
+              )}
+
+              {upload.location?.lat && upload.location?.lng && (
+                <div className="admin-map-preview">
+                  <MapContainer
+                    center={[upload.location.lat, upload.location.lng]}
+                    zoom={13}
+                    style={{ height: "200px", width: "100%", marginTop: "1rem" }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Marker position={[upload.location.lat, upload.location.lng]}>
+                      <Popup>{upload.location.address || "Selected location"}</Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
+              )}
+
               <p>Status: <strong>{upload.status}</strong></p>
               <button onClick={() => handleToggleStatus(upload._id)}>
                 Toggle Status
@@ -312,4 +350,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
