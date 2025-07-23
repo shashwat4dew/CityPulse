@@ -4,30 +4,63 @@ body {
   font-family: "Segoe UI", sans-serif;
 }
 
-.admin-dashboard {
+.dashboard-container {
   padding: 2rem;
   max-width: 1000px;
   margin: auto;
 }
 
-h1 {
+h1, h2 {
   text-align: center;
   color: #90caf9;
+}
+
+.upload-form {
+  background: #1e1e1e;
+  padding: 1.5rem;
+  border-radius: 10px;
   margin-bottom: 2rem;
+  box-shadow: 0 0 10px rgba(144, 202, 249, 0.2);
 }
 
-.error {
-  color: #f44336;
-  text-align: center;
+.upload-form input[type="text"],
+.upload-form input[type="file"] {
+  display: block;
+  width: 100%;
   margin-bottom: 1rem;
+  padding: 0.6rem;
+  border-radius: 5px;
+  background: #2e2e2e;
+  color: #fff;
+  border: 1px solid #444;
 }
 
-/* Filter section */
+.upload-form button {
+  padding: 0.6rem 1.2rem;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: 0.3s;
+}
+
+.upload-form button:hover {
+  background: #2196f3;
+}
+
+.address-preview {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: #ccc;
+}
+
 .filter-bar {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 
 .filter-bar select {
@@ -38,24 +71,24 @@ h1 {
   border: 1px solid #555;
 }
 
+/* Upload Card Design */
 .uploads {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Upload cards */
-.upload-item {
-  background: #1e1e1e;
+.upload-card {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  background: #1e1e1e;
   padding: 1rem;
   border-radius: 10px;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
-.upload-item img {
+.upload-card img {
   width: 200px;
   height: 150px;
   object-fit: cover;
@@ -68,44 +101,33 @@ h1 {
 }
 
 .upload-info p {
-  margin: 0.4rem 0;
+  margin-bottom: 0.4rem;
 }
 
-.status {
-  font-weight: bold;
-  font-size: 0.95rem;
-  color: #ff9800;
-}
-
-.status.completed {
+.upload-info .completed {
   color: #4caf50;
+  font-weight: bold;
 }
 
-.status.pending {
-  color: #f44336;
-}
-
-/* Button styling */
-.status-btn,
-.toggle-map {
+.toggle-map,
+.status-btn {
   background-color: #333;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 0.4rem 0.8rem;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
   margin-right: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
 }
 
-.status-btn:hover,
-.toggle-map:hover {
+.toggle-map:hover,
+.status-btn:hover {
   background-color: #555;
 }
 
-.map-preview {
-  margin-top: 10px;
-  border-radius: 8px;
+.leaflet-container {
+  border-radius: 10px;
   overflow: hidden;
 }
