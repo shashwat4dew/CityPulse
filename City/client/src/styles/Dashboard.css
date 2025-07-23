@@ -1,4 +1,4 @@
-/* General Dark Theme */
+/* General Layout */
 body {
   background-color: #121212;
   color: #f5f5f5;
@@ -13,7 +13,9 @@ body {
   margin: auto;
 }
 
-h1, h2 {
+/* Headings */
+h1,
+h2 {
   text-align: center;
   color: #90caf9;
   margin-bottom: 1.5rem;
@@ -47,6 +49,7 @@ h1, h2 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 0.5rem;
   transition: background 0.3s ease;
 }
 
@@ -54,28 +57,34 @@ h1, h2 {
   background: #2196f3;
 }
 
+/* Address Preview */
 .address-preview {
   margin-top: 0.5rem;
   font-style: italic;
   color: #ccc;
 }
 
-/* Upload Cards */
+/* Uploads Section */
 .upload-cards-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  max-width: 1000px;
+  margin: auto;
 }
 
+/* Upload Card */
 .upload-card {
   background: #1e1e1e;
   padding: 1rem;
   border-radius: 10px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2rem;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
   transition: transform 0.2s, box-shadow 0.3s;
+  min-height: 150px;
 }
 
 .upload-card:hover {
@@ -84,49 +93,69 @@ h1, h2 {
 }
 
 .upload-card img {
-  width: 100%;
-  max-width: 200px;
-  height: auto;
+  width: 200px;
+  height: 130px;
   border-radius: 10px;
   object-fit: cover;
 }
 
+/* Card Text */
 .card-details {
   flex: 1;
-  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 130px;
 }
 
-/* Location Display */
+.card-details p {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+}
+
+.completed-mark {
+  color: #81c784;
+  font-weight: bold;
+}
+
+/* Address */
 .upload-address {
   font-size: 0.95rem;
   margin-top: 0.3rem;
-  color: #a5d6ff;
-  font-style: italic;
+  color: #ccc;
 }
 
-/* Map Button */
+/* Show Map Button */
 .map-toggle-btn {
-  background: #444;
-  color: #fff;
+  background: #1976d2;
+  color: white;
   padding: 0.4rem 0.8rem;
-  margin-top: 0.5rem;
+  width: fit-content;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
 }
 
 .map-toggle-btn:hover {
-  background: #666;
+  background: #2196f3;
 }
 
-/* Filter & Sorting Bar */
+/* Embedded Map Styling */
+.map-preview {
+  margin-top: 0.8rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #444;
+}
+
+/* Filter Bar */
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 1rem;
-  margin: 1.5rem 0;
+  margin: 1rem 0 2rem;
 }
 
 .filter-bar select {
@@ -137,31 +166,9 @@ h1, h2 {
   border: 1px solid #555;
 }
 
-/* Embedded Map */
-.preview-map {
-  width: 100%;
-  height: 250px;
-  margin-top: 1rem;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* Completed Mark */
-.completed-mark {
-  color: #66bb6a;
-  font-weight: bold;
-  margin-top: 0.5rem;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .upload-card {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filter-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+/* No Uploads Message */
+.no-uploads {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
 }
