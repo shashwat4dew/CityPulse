@@ -46,7 +46,7 @@ const uploadSchema = new mongoose.Schema({
 },
 
   status: { type: String, enum: ["pending", "completed"], default: "pending" },
-});
+}, { timestamps: true });
 
 const Upload = mongoose.model("Upload", uploadSchema);
 
