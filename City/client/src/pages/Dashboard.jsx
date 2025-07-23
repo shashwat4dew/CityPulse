@@ -222,8 +222,6 @@
 
 
 
-
-
 import "../styles/Dashboard.css";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
@@ -240,6 +238,7 @@ import L from "leaflet";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
+// Fix leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -263,8 +262,7 @@ const LocationMarker = ({ setLat, setLng, setAddress }) => {
         );
         const data = await res.json();
         setAddress(data.display_name || "Unknown Location");
-      } catch (err) {
-        console.error("Geocoding failed", err);
+      } catch {
         setAddress("Unknown Location");
       }
     },
@@ -280,24 +278,10 @@ const Dashboard = () => {
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [address, setAddress] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [filter, setFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [expandedMap, setExpandedMap] = useState({});
   const fileInputRef = useRef();
-
-  const fetchUploads = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const res = await axios.get(`${baseURL}/api/uploads`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setUploads(res.data.uploads);
-    } catch (err) {
-      console.error("Error fetching uploads:", err);
-    }
-  };
 
   useEffect(() => {
     const email = localStorage.getItem("email");
@@ -309,6 +293,20 @@ const Dashboard = () => {
 
     fetchUploads();
   }, []);
+
+  const fetchUploads = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await axios.get(`${baseURL}/api/uploads`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUploads(res.data.uploads);
+    } catch (err) {
+      console.error("Error fetching uploads:", err);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -348,22 +346,18 @@ const Dashboard = () => {
   };
 
   const filteredUploads = uploads
-    .filter((u) => {
-      if (filterStatus === "all") return true;
-      return u.status === filterStatus;
-    })
-    .sort((a, b) => {
-      const da = new Date(a.createdAt || a._id);
-      const db = new Date(b.createdAt || b._id);
-      return sortOrder === "newest" ? db - da : da - db;
-    });
+    .filter((u) => filter === "all" || u.status === filter)
+    .sort((a, b) =>
+      sortOrder === "asc"
+        ? new Date(a.createdAt) - new Date(b.createdAt)
+        : new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
   return (
     <div className="dashboard-container">
       <h1>Upload Issue</h1>
 
       <form onSubmit={handleSubmit} className="upload-form">
-        <label htmlFor="fileInput">Upload an Image</label>
         <input
           id="fileInput"
           type="file"
@@ -380,72 +374,95 @@ const Dashboard = () => {
           required
         />
 
-        <div className="map-wrapper">
-          <label>Pick Location on Map:</label>
-          <MapContainer
-            center={[20.5937, 78.9629]}
-            zoom={5}
-            style={{ height: "300px", width: "100%", marginTop: "1rem" }}
-          >
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {lat && lng && (
-              <Marker position={[lat, lng]}>
-                <Popup>{address || "Selected location"}</Popup>
-              </Marker>
-            )}
-            <LocationMarker
-              setLat={setLat}
-              setLng={setLng}
-              setAddress={setAddress}
-            />
-          </MapContainer>
-        </div>
+        <label>Select Location on Map:</label>
+        <MapContainer
+          center={[20.5937, 78.9629]}
+          zoom={5}
+          style={{ height: "300px", marginBottom: "1rem" }}
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {lat && lng && (
+            <Marker position={[lat, lng]}>
+              <Popup>{address || "Selected location"}</Popup>
+            </Marker>
+          )}
+          <LocationMarker
+            setLat={setLat}
+            setLng={setLng}
+            setAddress={setAddress}
+          />
+        </MapContainer>
 
-        {address && <p><strong>Address:</strong> {address}</p>}
+        {address && <p><strong>📍 Address:</strong> {address}</p>}
 
         <button type="submit">Submit</button>
       </form>
 
-      <hr />
-      <h2>Previous Uploads</h2>
-
       <div className="filter-bar">
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-          <option value="all">All</option>
+        <select onChange={(e) => setFilter(e.target.value)} value={filter}>
+          <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </select>
 
-        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
+        <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
+          <option value="desc">Newest First</option>
+          <option value="asc">Oldest First</option>
         </select>
       </div>
 
+      <h2>Previous Uploads</h2>
       <div className="uploads">
         {filteredUploads.length > 0 ? (
-          filteredUploads.map((upload, idx) => (
-            <div key={idx} className="upload-item">
+          filteredUploads.map((upload) => (
+            <div key={upload._id} className="upload-card">
               <img
                 src={`${baseURL}${upload.imageUrl}`}
                 alt="upload"
-                width="200"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/fallback.jpg";
                 }}
               />
-              <p>{upload.description}</p>
-              {upload.location?.address && (
-                <p><strong>📍</strong> {upload.location.address}</p>
-              )}
-              {upload.status === "completed" && (
-                <p className="completed-mark">✅ Solved</p>
-              )}
+              <div className="upload-info">
+                <p>{upload.description}</p>
+                {upload.location?.address && (
+                  <p><strong>📍</strong> {upload.location.address}</p>
+                )}
+                {upload.status === "completed" && (
+                  <p className="completed">✅ Solved</p>
+                )}
+                <button
+                  className="toggle-map"
+                  onClick={() =>
+                    setExpandedMap((prev) => ({
+                      ...prev,
+                      [upload._id]: !prev[upload._id],
+                    }))
+                  }
+                >
+                  {expandedMap[upload._id] ? "Hide Map" : "Show Map"}
+                </button>
+                {expandedMap[upload._id] && upload.location?.lat && (
+                  <MapContainer
+                    center={[upload.location.lat, upload.location.lng]}
+                    zoom={13}
+                    scrollWheelZoom={false}
+                    style={{ height: "200px", marginTop: "10px" }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Marker
+                      position={[upload.location.lat, upload.location.lng]}
+                    >
+                      <Popup>{upload.location.address}</Popup>
+                    </Marker>
+                  </MapContainer>
+                )}
+              </div>
             </div>
           ))
         ) : (
-          <p>No uploads found</p>
+          <p>No uploads found.</p>
         )}
       </div>
     </div>
@@ -453,3 +470,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
