@@ -230,18 +230,21 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Dashboard2.jsx
-import "./Dash2.css";
+import "../styles/Dashboard2.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
-// Leaflet icon fix
+// Fix leaflet default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -255,7 +258,6 @@ L.Icon.Default.mergeOptions({
 const AdminDashboard = () => {
   const [uploads, setUploads] = useState([]);
   const [error, setError] = useState("");
-  const [visibleMaps, setVisibleMaps] = useState({}); // control which map is shown
 
   useEffect(() => {
     const fetchUploads = async () => {
@@ -274,7 +276,6 @@ const AdminDashboard = () => {
     fetchUploads();
   }, []);
 
-
   const handleToggleStatus = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -284,7 +285,6 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      
       const updatedUpload = res.data.upload;
 
       setUploads((prevUploads) =>
@@ -297,13 +297,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const toggleMap = (id) => {
-    setVisibleMaps((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
   return (
     <div className="admin-dashboard">
       <h1>Admin Dashboard</h1>
@@ -312,56 +305,42 @@ const AdminDashboard = () => {
       {uploads.length === 0 ? (
         <p>No uploads found.</p>
       ) : (
-        <div className="uploads-grid">
+        <div className="uploads">
           {uploads.map((upload, index) => (
-            <div key={index} className="upload-card">
+            <div key={index} className="upload-item">
               <img
                 src={`${baseURL}${upload.imageUrl}`}
                 alt={upload.description}
-                className="upload-image"
+                width="200"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/fallback.jpg";
                 }}
               />
-              <div className="upload-details">
-                <p><strong>Description:</strong> {upload.description}</p>
-                {upload?.location?.address && (
-                  <p><strong>📍 Address:</strong> {upload.location.address}</p>
-                )}
-                <p>
-                  <strong>Status:</strong> <span className={`status-${upload.status}`}>
-                    {upload.status}
-                  </span>
-                </p>
+              <p>{upload.description}</p>
+              {upload.location?.address && (
+                <p><strong>📍 Address:</strong> {upload.location.address}</p>
+              )}
 
-                <div className="admin-buttons">
-                  <button onClick={() => handleToggleStatus(upload._id)}>
-                    Toggle Status
-                  </button>
-                  {upload.location?.lat && upload.location?.lng && (
-                    <button onClick={() => toggleMap(upload._id)}>
-                      {visibleMaps[upload._id] ? "Hide Location" : "Show Location"}
-                    </button>
-                  )}
+              {upload.location?.lat && upload.location?.lng && (
+                <div className="admin-map-preview">
+                  <MapContainer
+                    center={[upload.location.lat, upload.location.lng]}
+                    zoom={13}
+                    style={{ height: "200px", width: "100%", marginTop: "1rem" }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Marker position={[upload.location.lat, upload.location.lng]}>
+                      <Popup>{upload.location.address || "Selected location"}</Popup>
+                    </Marker>
+                  </MapContainer>
                 </div>
+              )}
 
-                {visibleMaps[upload._id] && upload.location?.lat && upload.location?.lng && (
-                  <div className="map-container">
-                    <MapContainer
-                      center={[upload.location.lat, upload.location.lng]}
-                      zoom={13}
-                      scrollWheelZoom={false}
-                      style={{ height: "250px", width: "100%", marginTop: "10px" }}
-                    >
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                      <Marker position={[upload.location.lat, upload.location.lng]}>
-                        <Popup>{upload.location.address || "Location"}</Popup>
-                      </Marker>
-                    </MapContainer>
-                  </div>
-                )}
-              </div>
+              <p>Status: <strong>{upload.status}</strong></p>
+              <button onClick={() => handleToggleStatus(upload._id)}>
+                Toggle Status
+              </button>
             </div>
           ))}
         </div>
