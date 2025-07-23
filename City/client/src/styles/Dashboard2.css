@@ -1,69 +1,82 @@
-.completed-mark {
-    color: green;
-    font-weight: bold;
-    margin-top: 5px;
-  }
-  
-  button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  .admin-dashboard {
-  padding: 20px;
-  font-family: sans-serif;
+.admin-dashboard {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f4f6f9;
 }
 
-.uploads-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+.admin-dashboard h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.uploads {
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+  justify-content: center;
 }
 
-.upload-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  overflow: hidden;
+.upload-item {
   background: #fff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  width: 300px;
+  transition: transform 0.2s;
 }
 
-.upload-image {
+.upload-item:hover {
+  transform: scale(1.01);
+}
+
+.upload-item img {
   width: 100%;
-  border-radius: 8px;
+  height: 180px;
   object-fit: cover;
+  border-radius: 8px;
 }
 
-.upload-details {
-  margin-top: 10px;
+.upload-item p {
+  margin: 0.5rem 0;
 }
 
-.admin-buttons button {
-  margin: 5px 5px 5px 0;
-  padding: 6px 12px;
+.upload-item button {
+  background: #34495e;
+  color: white;
+  padding: 8px 12px;
   font-size: 14px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.3s;
 }
 
-.status-pending {
-  color: #c0392b;
+.upload-item button:hover {
+  background: #2c3e50;
 }
-.status-completed {
-  color: #27ae60;
+
+.toggle-map {
+  margin-top: 0.5rem;
+  background: #2980b9;
+}
+
+.toggle-map:hover {
+  background: #1e6ca6;
 }
 
 .map-container {
-  margin-top: 10px;
-  border: 1px solid #ccc;
+  margin-top: 0.5rem;
+  height: 200px;
   border-radius: 8px;
   overflow: hidden;
 }
