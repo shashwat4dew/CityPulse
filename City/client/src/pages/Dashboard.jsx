@@ -311,16 +311,24 @@
 // };
 
 // export default Dashboard;
+
+
 import "../styles/Dashboard.css";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
-// Leaflet fix for missing icons
+// Fix leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -331,15 +339,37 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+const LocationMarker = ({ setLat, setLng, setAddress }) => {
+  useMapEvents({
+    click: async (e) => {
+      const { lat, lng } = e.latlng;
+      setLat(lat);
+      setLng(lng);
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+        );
+        const data = await res.json();
+        setAddress(data.display_name);
+      } catch (err) {
+        console.error("Reverse geocoding failed", err);
+        setAddress("Unknown Location");
+      }
+    },
+  });
+  return null;
+};
+
 const Dashboard = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [uploads, setUploads] = useState([]);
-  const [fileInputRef] = useState(useRef());
-
-  // Map modal state
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
+  const [address, setAddress] = useState("");
+  const [showMapPopup, setShowMapPopup] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [showMap, setShowMap] = useState(false);
+  const fileInputRef = useRef();
 
   const fetchUploads = async () => {
     try {
@@ -362,11 +392,16 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image || !description) return alert("Provide all fields");
+    if (!image || !description || !lat || !lng || !address) {
+      return alert("Please fill all fields and select a location.");
+    }
 
     const formData = new FormData();
     formData.append("image", image);
     formData.append("description", description);
+    formData.append("lat", lat);
+    formData.append("lng", lng);
+    formData.append("address", address);
 
     const token = localStorage.getItem("token");
     if (!token) return alert("Login required");
@@ -382,6 +417,9 @@ const Dashboard = () => {
       setUploads((prev) => [...prev, res.data.upload]);
       setDescription("");
       setImage(null);
+      setLat(null);
+      setLng(null);
+      setAddress("");
       fileInputRef.current.value = "";
     } catch (err) {
       console.error("Upload failed:", err);
@@ -391,7 +429,7 @@ const Dashboard = () => {
 
   const handleViewLocation = (location) => {
     setSelectedLocation(location);
-    setShowMap(true);
+    setShowMapPopup(true);
   };
 
   return (
@@ -414,6 +452,26 @@ const Dashboard = () => {
           placeholder="Enter a description..."
           required
         />
+
+        <div className="map-wrapper">
+          <label>Pick Location on Map:</label>
+          <MapContainer
+            center={[20.5937, 78.9629]}
+            zoom={5}
+            style={{ height: "300px", width: "100%", marginTop: "1rem" }}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {lat && lng && (
+              <Marker position={[lat, lng]}>
+                <Popup>{address || "Selected location"}</Popup>
+              </Marker>
+            )}
+            <LocationMarker setLat={setLat} setLng={setLng} setAddress={setAddress} />
+          </MapContainer>
+        </div>
+
+        {address && <p><strong>Address:</strong> {address}</p>}
+
         <button type="submit">Submit</button>
       </form>
 
@@ -434,15 +492,11 @@ const Dashboard = () => {
               />
               <p>{upload.description}</p>
               {upload.location?.address && (
-                <p>
-                  <strong>📍</strong> {upload.location.address}
-                </p>
+                <p><strong>📍</strong> {upload.location.address}</p>
               )}
               {upload.status === "completed" && (
                 <p className="completed-mark">✅ Solved</p>
               )}
-
-              {/* View on Map Button */}
               {upload.location?.lat && upload.location?.lng && (
                 <button
                   onClick={() => handleViewLocation(upload.location)}
@@ -466,13 +520,12 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Map Modal */}
-      {showMap && selectedLocation && (
+      {showMapPopup && selectedLocation && (
         <div className="map-popup">
           <div className="map-popup-inner">
             <button
               className="close-btn"
-              onClick={() => setShowMap(false)}
+              onClick={() => setShowMapPopup(false)}
               style={{ float: "right", marginBottom: "5px" }}
             >
               ✖
