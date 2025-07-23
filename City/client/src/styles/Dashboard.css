@@ -77,15 +77,16 @@ h2 {
 
 /* Individual Upload Card */
 .upload-card {
+  width: 100%;
+  min-height: 160px;
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 1rem;
   background: #1e1e1e;
   padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-  width: 100%;
-  min-height: 160px;
 }
 
 .upload-card img {
