@@ -57,7 +57,7 @@ h2 {
   background: #2196f3;
 }
 
-/* Map & Address Preview */
+/* Map Wrapper & Address */
 .map-wrapper {
   margin-top: 1rem;
 }
@@ -66,85 +66,6 @@ h2 {
   margin-top: 0.5rem;
   font-style: italic;
   color: #ccc;
-}
-
-/* Upload Cards Container */
-.upload-cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Individual Upload Card */
-.upload-card {
-  width: 100%;
-  min-height: 160px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 1rem;
-  background: #1e1e1e;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-}
-
-.upload-card img {
-  width: 200px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-/* Text Content in Card */
-.card-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 140px;
-  overflow: hidden;
-  padding-right: 0.5rem;
-}
-
-.card-details p {
-  margin: 0.3rem 0;
-  font-size: 1rem;
-  word-wrap: break-word;
-}
-
-.upload-address {
-  font-size: 0.95rem;
-  color: #ccc;
-}
-
-/* Status Styles */
-.completed-mark {
-  color: #81c784;
-  font-weight: bold;
-  margin-top: auto;
-}
-
-.pending-mark {
-  color: #ffb74d;
-  font-weight: bold;
-  margin-top: auto;
-}
-
-/* Show Map Button */
-.map-toggle-btn {
-  background: #444;
-  color: #fff;
-  padding: 0.4rem 0.8rem;
-  margin-top: 0.5rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.map-toggle-btn:hover {
-  background: #666;
 }
 
 /* Filter Bar */
@@ -161,4 +82,97 @@ h2 {
   background-color: #1e1e1e;
   color: #fff;
   border: 1px solid #555;
+}
+
+/* Upload Cards Layout */
+.upload-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.upload-card {
+  background: #1e1e1e;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  min-height: 150px;
+  align-items: flex-start;
+}
+
+/* Card Image */
+.upload-card img {
+  width: 200px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Card Content */
+.card-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+  justify-content: space-between;
+}
+
+/* Description and Address */
+.card-details p {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+  word-wrap: break-word;
+}
+
+/* Address Styling */
+.upload-address {
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #fff;
+  width: fit-content;
+  margin-top: 0.4rem;
+}
+
+.status-badge.pending {
+  background-color: #f57c00; /* Orange */
+}
+
+.status-badge.completed {
+  background-color: #43a047; /* Green */
+}
+
+/* Map Button */
+.map-toggle-btn {
+  background: #444;
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+.map-toggle-btn:hover {
+  background: #666;
+}
+
+/* Map Preview */
+.map-preview {
+  margin-top: 10px;
+  border-radius: 8px;
+  overflow: hidden;
 }
