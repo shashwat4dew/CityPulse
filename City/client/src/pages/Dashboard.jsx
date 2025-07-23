@@ -482,8 +482,8 @@ const Dashboard = () => {
                 }}
               />
               <p>{upload.description}</p>
-              {upload.address && (
-                <p><strong>📍</strong> {upload.address}</p>
+              {upload.location.address && (
+                <p><strong>📍</strong> {upload.location.address}</p>
               )}
               {upload.status === "completed" && (
                 <p className="completed-mark">✅ Solved</p>
