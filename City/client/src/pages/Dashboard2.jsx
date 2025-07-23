@@ -136,8 +136,6 @@
 
 // export default AdminDashboard;
 
-
-
 import "../styles/Dashboard.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -152,7 +150,7 @@ import L from "leaflet";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
-// Leaflet icon fix
+// Fix leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -165,58 +163,25 @@ L.Icon.Default.mergeOptions({
 
 const AdminDashboard = () => {
   const [uploads, setUploads] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [error, setError] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [sortOrder, setSortOrder] = useState("latest");
-  const [openMapIds, setOpenMapIds] = useState(new Set());
+  const [filter, setFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [mapVisible, setMapVisible] = useState({});
 
   useEffect(() => {
-    const fetchUploads = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${baseURL}/api/uploads`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const sorted = res.data.uploads.sort(
-          (a, b) =>
-            new Date(b.createdAt || b._id.substring(0, 8)) -
-            new Date(a.createdAt || a._id.substring(0, 8))
-        );
-        setUploads(sorted);
-        setFiltered(sorted);
-      } catch (err) {
-        console.error("Error fetching uploads:", err);
-        setError("Failed to fetch uploads. Please try again later.");
-      }
-    };
-
     fetchUploads();
   }, []);
 
-  useEffect(() => {
-    let result = [...uploads];
-
-    if (filterStatus !== "all") {
-      result = result.filter((u) => u.status === filterStatus);
+  const fetchUploads = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${baseURL}/api/uploads`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUploads(res.data.uploads);
+    } catch (err) {
+      console.error("Error fetching uploads:", err);
     }
-
-    if (sortOrder === "latest") {
-      result.sort(
-        (a, b) =>
-          new Date(b.createdAt || b._id.substring(0, 8)) -
-          new Date(a.createdAt || a._id.substring(0, 8))
-      );
-    } else {
-      result.sort(
-        (a, b) =>
-          new Date(a.createdAt || a._id.substring(0, 8)) -
-          new Date(b.createdAt || b._id.substring(0, 8))
-      );
-    }
-
-    setFiltered(result);
-  }, [filterStatus, sortOrder, uploads]);
+  };
 
   const handleToggleStatus = async (id) => {
     try {
@@ -227,120 +192,106 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const updated = res.data.upload;
-      setUploads((prev) =>
-        prev.map((u) => (u._id === id ? { ...u, status: updated.status } : u))
+      const updatedUpload = res.data.upload;
+
+      setUploads((prevUploads) =>
+        prevUploads.map((upload) =>
+          upload._id === id ? { ...upload, status: updatedUpload.status } : upload
+        )
       );
     } catch (err) {
       console.error("Error toggling status:", err);
     }
   };
 
-  const toggleMap = (id) => {
-    const updatedSet = new Set(openMapIds);
-    if (updatedSet.has(id)) {
-      updatedSet.delete(id);
-    } else {
-      updatedSet.add(id);
-    }
-    setOpenMapIds(updatedSet);
-  };
+  const filteredSortedUploads = uploads
+    .filter((u) => filter === "all" || u.status === filter)
+    .sort((a, b) =>
+      sortOrder === "asc"
+        ? new Date(a.createdAt) - new Date(b.createdAt)
+        : new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
   return (
     <div className="dashboard-container">
       <h1>Admin Dashboard</h1>
-      {error && <p className="error">{error}</p>}
 
-      {/* 🔍 Filters */}
       <div className="filter-bar">
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
+        <select onChange={(e) => setFilter(e.target.value)} value={filter}>
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </select>
 
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
-          <option value="latest">Latest First</option>
-          <option value="oldest">Oldest First</option>
+        <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
+          <option value="desc">Newest First</option>
+          <option value="asc">Oldest First</option>
         </select>
       </div>
 
-      {filtered.length === 0 ? (
-        <p>No uploads found.</p>
-      ) : (
-        <div className="upload-cards-container">
-          {filtered.map((upload, index) => (
-            <div key={index} className="upload-card">
+      <div className="uploads">
+        {filteredSortedUploads.length > 0 ? (
+          filteredSortedUploads.map((upload) => (
+            <div key={upload._id} className="upload-card">
               <img
                 src={`${baseURL}${upload.imageUrl}`}
-                alt={upload.description}
+                alt="upload"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/fallback.jpg";
                 }}
               />
-              <div className="card-details">
-                <p><strong>Description:</strong> {upload.description}</p>
-                <p className="upload-address">
-                  📍 {upload?.location?.address || "No address provided"}
+              <div className="upload-info">
+                <p>{upload.description}</p>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span className={upload.status === "completed" ? "completed" : ""}>
+                    {upload.status}
+                  </span>
                 </p>
-                <p className={upload.status === "completed" ? "completed-mark" : "pending-mark"}>
-                  Status: {upload.status}
-                </p>
-
+                {upload.location?.address && (
+                  <p>
+                    <strong>📍</strong> {upload.location.address}
+                  </p>
+                )}
                 <button
-                  className="map-toggle-btn"
-                  onClick={() => toggleMap(upload._id)}
+                  className="toggle-map"
+                  onClick={() =>
+                    setMapVisible((prev) => ({
+                      ...prev,
+                      [upload._id]: !prev[upload._id],
+                    }))
+                  }
                 >
-                  {openMapIds.has(upload._id)
-                    ? "Hide Map"
-                    : "Show Map"}
+                  {mapVisible[upload._id] ? "Hide Map" : "Show Map"}
                 </button>
-
                 <button
-                  style={{ marginLeft: "0.5rem" }}
+                  className="status-btn"
                   onClick={() => handleToggleStatus(upload._id)}
-                  className="map-toggle-btn"
                 >
                   Toggle Status
                 </button>
-              </div>
 
-              {openMapIds.has(upload._id) &&
-                upload?.location?.lat &&
-                upload?.location?.lng && (
-                  <div style={{ width: "100%", marginTop: "1rem" }}>
-                    <MapContainer
-                      center={[
-                        upload.location.lat,
-                        upload.location.lng,
-                      ]}
-                      zoom={13}
-                      scrollWheelZoom={false}
-                      style={{ height: "200px", width: "100%" }}
-                    >
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                      <Marker
-                        position={[
-                          upload.location.lat,
-                          upload.location.lng,
-                        ]}
-                      >
-                        <Popup>{upload.location.address}</Popup>
-                      </Marker>
-                    </MapContainer>
-                  </div>
+                {mapVisible[upload._id] && upload.location?.lat && (
+                  <MapContainer
+                    center={[upload.location.lat, upload.location.lng]}
+                    zoom={13}
+                    scrollWheelZoom={false}
+                    style={{ height: "200px", marginTop: "10px" }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Marker position={[upload.location.lat, upload.location.lng]}>
+                      <Popup>{upload.location.address}</Popup>
+                    </Marker>
+                  </MapContainer>
                 )}
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        ) : (
+          <p>No uploads found.</p>
+        )}
+      </div>
     </div>
   );
 };
