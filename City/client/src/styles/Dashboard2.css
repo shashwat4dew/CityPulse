@@ -1,19 +1,34 @@
+:root {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-color: #e0e0e0;
+  --accent: #2980b9;
+  --button-bg: #34495e;
+  --button-hover: #2c3e50;
+  --map-height: 200px;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
 .admin-dashboard {
   max-width: 1000px;
   margin: auto;
   padding: 2rem;
   font-family: "Segoe UI", sans-serif;
-  background-color: #f4f6f9;
+  background-color: var(--bg-color);
 }
 
 .admin-dashboard h1 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 
 .error {
-  color: red;
+  color: #ff6b6b;
   text-align: center;
   margin-bottom: 1rem;
 }
@@ -26,9 +41,9 @@
 }
 
 .upload-item {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.05);
   padding: 1rem;
   width: 300px;
   transition: transform 0.2s;
@@ -50,8 +65,8 @@
 }
 
 .upload-item button {
-  background: #34495e;
-  color: white;
+  background: var(--button-bg);
+  color: var(--text-color);
   padding: 8px 12px;
   font-size: 14px;
   border: none;
@@ -62,12 +77,12 @@
 }
 
 .upload-item button:hover {
-  background: #2c3e50;
+  background: var(--button-hover);
 }
 
 .toggle-map {
   margin-top: 0.5rem;
-  background: #2980b9;
+  background: var(--accent);
 }
 
 .toggle-map:hover {
@@ -76,7 +91,13 @@
 
 .map-container {
   margin-top: 0.5rem;
-  height: 200px;
+  height: var(--map-height);
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* Optional: style Leaflet tiles */
+.leaflet-container {
+  filter: brightness(90%) contrast(1.1);
+  border-radius: 8px;
 }
