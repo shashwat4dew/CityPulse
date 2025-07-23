@@ -274,7 +274,7 @@ const AdminDashboard = () => {
     fetchUploads();
   }, []);
 
-  
+
   const handleToggleStatus = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -284,6 +284,7 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      
       const updatedUpload = res.data.upload;
 
       setUploads((prevUploads) =>
