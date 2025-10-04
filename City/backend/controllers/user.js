@@ -59,27 +59,32 @@ const login = async (req, res) => {
 
 //new register
 const register = async (req, res) => {
-  let foundUser = await User.findOne({ email: req.body.email });
+  try {
+    let foundUser = await User.findOne({ email: req.body.email });
 
-  if (foundUser === null) {
-    let { username, email, password, phoneNumber } = req.body;
+    if (foundUser === null) {
+      let { username, email, password, phoneNumber } = req.body;
 
-    if (username && email && password && phoneNumber) {
-      const person = new User({
-        name: username,
-        email,
-        password,
-        phoneNumber
-      });
-      await person.save();
+      if (username && email && password && phoneNumber) {
+        const person = new User({
+          name: username,
+          email,
+          password,
+          phoneNumber
+        });
+        await person.save();
 
-      // You can also generate and return JWT token here if needed
-      return res.status(201).json({ person });
+        // You can also generate and return JWT token here if needed
+        return res.status(201).json({ person });
+      } else {
+        return res.status(400).json({ msg: "Please add all values" });
+      }
     } else {
-      return res.status(400).json({ msg: "Please add all values" });
+      return res.status(400).json({ msg: "Email already in use" });
     }
-  } else {
-    return res.status(400).json({ msg: "Email already in use" });
+  } catch (error) {
+    console.error("Error in register:", error);
+    return res.status(500).json({ msg: "Internal server error", error: error.message });
   }
 };
 
