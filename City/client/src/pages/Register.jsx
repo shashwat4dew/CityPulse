@@ -193,47 +193,101 @@ const Register = () => {
     }
   };
 
-  const verifyOtpAndRegister = async (e) => {
-    e.preventDefault();
-    const name = e.target.name.value;
-    const lastname = e.target.lastname.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-    const confirmPassword = e.target.confirmPassword.value;
+/////verifyOtpAndRegister
 
-    if (!name || !lastname || !email || !password || !confirmPassword) {
-      toast.error("Please fill all fields");
-      return;
-    }
+//   const verifyOtpAndRegister = async (e) => {
+//     e.preventDefault();
+//     const name = e.target.name.value;
+//     const lastname = e.target.lastname.value;
+//     const email = e.target.email.value;
+//     const password = e.target.password.value;
+//     const confirmPassword = e.target.confirmPassword.value;
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+//     if (!name || !lastname || !email || !password || !confirmPassword) {
+//       toast.error("Please fill all fields");
+//       return;
+//     }
 
-    if (!otpSent || !otp) {
-      toast.error("OTP not verified");
-      return;
-    }
+//     if (password !== confirmPassword) {
+//       toast.error("Passwords do not match");
+//       return;
+//     }
 
-    try {
+//     if (!otpSent || !otp) {
+//       toast.error("OTP not verified");
+//       return;
+//     }
+
+//     try {
+//       await verificationId.confirm(otp);
+//       const formData = {
+//   username: `${name} ${lastname}`,
+//   email,
+//   password,
+//   phoneNumber: phone,  // ✅ not just `phone`
+// };
+
+
+//       const response = await axios.post(`${baseURL}/api/register`, formData);
+//       localStorage.setItem("token", response.data.token);
+//       toast.success("Registration successful");
+//       navigate("/login");
+//     } catch (err) {
+//       toast.error("Invalid OTP or registration failed");
+//     }
+//   };
+
+//////end verifyOtpAndRegister
+
+const verifyOtpAndRegister = async (e) => {
+  e.preventDefault();
+  const name = e.target.name.value;
+  const lastname = e.target.lastname.value;
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+  const confirmPassword = e.target.confirmPassword.value;
+
+  if (!name || !lastname || !email || !password || !confirmPassword) {
+    toast.error("Please fill all fields");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
+
+  try {
+    // ✅ Bypass OTP if the phone number is your special number
+    if (phone === "+917389825395") {
+      toast.info("Bypassing OTP for admin test number");
+    } else {
+      if (!otpSent || !otp) {
+        toast.error("Please verify your OTP first");
+        return;
+      }
       await verificationId.confirm(otp);
-      const formData = {
-  username: `${name} ${lastname}`,
-  email,
-  password,
-  phoneNumber: phone,  // ✅ not just `phone`
+    }
+
+    // ✅ Proceed to register
+    const formData = {
+      username: `${name} ${lastname}`,
+      email,
+      password,
+      phoneNumber: phone,
+    };
+
+    const response = await axios.post(`${baseURL}/api/register`, formData);
+    localStorage.setItem("token", response.data.token);
+    toast.success("Registration successful");
+    navigate("/login");
+  } catch (err) {
+    toast.error("Invalid OTP or registration failed");
+    console.error(err);
+  }
 };
 
 
-      const response = await axios.post(`${baseURL}/api/register`, formData);
-      localStorage.setItem("token", response.data.token);
-      toast.success("Registration successful");
-      navigate("/login");
-    } catch (err) {
-      toast.error("Invalid OTP or registration failed");
-    }
-  };
 
   return (
     <div className="register-main">
